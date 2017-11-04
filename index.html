@@ -6,8 +6,8 @@
   <div id="container"></div>
   <script>
     // Set the scene size.
-    const WIDTH = 400;
-    const HEIGHT = 300;
+    const WIDTH = 1400;
+    const HEIGHT = 700;
 
     // Set some camera attributes.
     const VIEW_ANGLE = 45;
@@ -42,6 +42,22 @@
     // DOM element.
     container.appendChild(renderer.domElement);
 
+    const boxGeometry = new THREE.BoxGeometry(40, 40, 40);
+
+    const boxMaterial =  new THREE.MeshPhongMaterial({
+      color: 0xecebec,
+      specular: 0x000000,
+      shininess: 100
+    });
+
+    const box = new THREE.Mesh(boxGeometry, boxMaterial);
+
+    box.position.x = -100;
+    box.position.y = 0;
+    box.position.z = -450;
+
+    scene.add(box);
+
     // create the sphere's material
     const sphereMaterial =
       new THREE.MeshLambertMaterial(
@@ -50,7 +66,7 @@
         });
 
     // Set up the sphere vars
-    const RADIUS = 40;
+    const RADIUS = 10;
     const SEGMENTS = 16;
     const RINGS = 16;
 
@@ -88,6 +104,9 @@
     function update () {
       // Draw!
       renderer.render(scene, camera);
+
+      box.rotation.x += 0.01;
+      box.rotation.y += 0.05;
 
       // Schedule the next frame.
       requestAnimationFrame(update);

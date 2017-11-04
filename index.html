@@ -1,9 +1,39 @@
 <html>
 <head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/88/three.min.js"></script>
 </head>
 <body>
+
   <div id="container"></div>
+  <!-- Shaders -->
+	<script type="x-shader/x-vertex" id="vertexshader">
+
+		// switch on high precision floats
+		#ifdef GL_ES
+		precision highp float;
+		#endif
+
+		void main()
+		{
+			gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+		}
+
+	</script>
+
+	<script type="x-shader/x-fragment" id="fragmentshader">
+
+		#ifdef GL_ES
+		precision highp float;
+		#endif
+
+		void main()
+		{
+			gl_FragColor 	= vec4(1.0,0.0,0.4,1.0);
+		}
+
+	</script>
+
   <script>
     // Set the scene size.
     const WIDTH = 1400;
@@ -51,12 +81,19 @@
     });
 
     const box = new THREE.Mesh(boxGeometry, boxMaterial);
+    const box2 = new THREE.Mesh(boxGeometry, boxMaterial);
 
     box.position.x = -100;
     box.position.y = 0;
     box.position.z = -450;
 
-    scene.add(box);
+    box2.position.x = 100;
+    box2.position.y = 0;
+    box2.position.z = -450;
+
+
+    //scene.add(box);
+    //scene.add(box2);
 
     // create the sphere's material
     const sphereMaterial =
@@ -64,6 +101,21 @@
         {
           color: 0xCC0000
         });
+
+    // create the sphere's material
+  	var shaderMaterial = new THREE.ShaderMaterial({
+  		vertexShader:   $('#vertexshader').text(),
+  		fragmentShader: $('#fragmentshader').text()
+  	});
+
+  	// set up the sphere vars
+  	var radius = 50, segments = 16, rings = 16;
+
+  	// create a new mesh with sphere geometry -
+  	// we will cover the sphereMaterial next!
+  	var sphere = new THREE.Mesh(
+  	   new THREE.SphereGeometry(radius, segments, rings),
+  	   shaderMaterial);
 
     // Set up the sphere vars
     const RADIUS = 10;
@@ -73,14 +125,14 @@
     // Create a new mesh with
     // sphere geometry - we will cover
     // the sphereMaterial next!
-    const sphere = new THREE.Mesh(
+    /*const sphere = new THREE.Mesh(
 
       new THREE.SphereGeometry(
         RADIUS,
         SEGMENTS,
         RINGS),
 
-      sphereMaterial);
+      sphereMaterial);*/
 
     // Move the Sphere back in Z so we
     // can see it.
@@ -101,12 +153,28 @@
     // add to the scene
     scene.add(pointLight);
 
+    let direction = 0;
+
     function update () {
       // Draw!
       renderer.render(scene, camera);
 
       box.rotation.x += 0.01;
       box.rotation.y += 0.05;
+
+      let bPos = box.position;
+      if(bPos.x > -200 && direction == 0)  {
+        bPos.x -= 1.4;
+      } else if (bPos.x < 300 && direction == 1) {
+        bPos.x += 2.5;
+      } else {
+        direction++;
+        console.log('Dir 3');
+      }
+
+      box2.rotation.x += 0.05;
+      box2.rotation.y += 0.01;
+
 
       // Schedule the next frame.
       requestAnimationFrame(update);
